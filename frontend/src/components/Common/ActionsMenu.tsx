@@ -9,14 +9,15 @@ import {
 import { BsThreeDotsVertical } from "react-icons/bs"
 import { FiEdit, FiTrash } from "react-icons/fi"
 
-import type { ItemPublic, UserPublic } from "../../client"
+import type { ItemPublic, UserPublic, FlashcardPublic } from "../../client"
 import EditUser from "../Admin/EditUser"
 import EditItem from "../Items/EditItem"
+import EditFlashcard from "../Flashcards/EditFlashcard"
 import Delete from "./DeleteAlert"
 
 interface ActionsMenuProps {
   type: string
-  value: ItemPublic | UserPublic
+  value: ItemPublic | UserPublic | FlashcardPublic
   disabled?: boolean
 }
 
@@ -51,6 +52,12 @@ const ActionsMenu = ({ type, value, disabled }: ActionsMenuProps) => {
         {type === "User" ? (
           <EditUser
             user={value as UserPublic}
+            isOpen={editUserModal.isOpen}
+            onClose={editUserModal.onClose}
+          />
+        ) : type === "Flashcard" ? (
+          <EditFlashcard
+            flashcard={value as FlashcardPublic}
             isOpen={editUserModal.isOpen}
             onClose={editUserModal.onClose}
           />

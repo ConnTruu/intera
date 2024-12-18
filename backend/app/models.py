@@ -44,6 +44,7 @@ class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    flashcards: list["Flashcard"] = Relationship(back_populates="owner", cascade_delete=True)
 
 
 # Properties to return via API, id is always required
@@ -92,6 +93,43 @@ class ItemsPublic(SQLModel):
     data: list[ItemPublic]
     count: int
 
+# Shared properties
+class FlashcardBase(SQLModel):
+    question: str = Field(min_length=1, max_length=255)
+    answer: str = Field(min_length=1, max_length=255)
+
+
+# Properties to receive on item creation
+class FlashcardCreate(FlashcardBase):
+    pass
+
+
+# Properties to receive on item update
+class FlashcardUpdate(FlashcardBase):
+    question: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+    answer: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+
+
+# Database model, database table inferred from class name
+class Flashcard(FlashcardBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    question: str = Field(max_length=255)
+    answer: str = Field(max_length=255)
+    owner_id: uuid.UUID = Field(
+        foreign_key="user.id", nullable=False, ondelete="CASCADE"
+    )
+    owner: User | None = Relationship(back_populates="flashcards")
+
+
+# Properties to return via API, id is always required
+class FlashcardPublic(FlashcardBase):
+    id: uuid.UUID
+    owner_id: uuid.UUID
+
+
+class FlashcardsPublic(SQLModel):
+    data: list[FlashcardPublic]
+    count: int
 
 # Generic message
 class Message(SQLModel):
